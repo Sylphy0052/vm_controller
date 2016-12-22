@@ -33,6 +33,14 @@ class Config():
 		self.clone_cpu = 100
 		self.clone_mem = 100
 
+	def clone_set_cpu(self, cpu):
+		self.clone_cpu = cpu
+
+	def clone_set_mem(self, mem):
+		self.clone_mem = mem
+
+	
+
 
 class IpData():
 	def __init__(self):
@@ -325,11 +333,17 @@ def _get_dbinfo_by_id(db, id):
 	return ip_list[0]
 
 def _get_my_ip():
+	net_name = ''
 	for name in netifaces.interfaces():
 		if name.count('lo') != 0:
 			continue
+		elif netifaces.ifaddresses(name).get(netifaces.AF_INET) == None:
+			continue
+		else:
+			net_name = name
+			break
 
-		info = netifaces.ifaddresses(name).get(netifaces.AF_INET)
+		info = netifaces.ifaddresses(net_name).get(netifaces.AF_INET)
 		print(info)
 		return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
 
