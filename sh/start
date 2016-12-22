@@ -1,0 +1,17 @@
+#!/bin/bash
+
+vm_ip=$1
+telnet_port=$2
+vm_id=$3
+
+expect -c "
+set timeout 50
+spawn sudo qemu-system-arm -enable-kvm -smp 1 -m 256 -M vexpress-a15 -cpu host -kernel /mnt/zImage -dtb /mnt/vexpress-v2p-ca15-tc1.dtb -append \"root=/dev/vda console=ttyAMA0 rootwait\" -drive if=none,file=/home/pi/diff${vm_id}.qcow2,id=factory -device virtio-blk-device,drive=factory -net nic,macaddr=02:fd:01:de:ad:34 -net tap -monitor telnet::${telnet_port},server,nowait -serial stdio -nographic
+expect \"login\"
+send \"root\n\"
+expect \"Password\"
+send \"linux\n\"
+expect \"nohostname:\"
+send \"./start.sh ${vm_ip}\n\"
+interact
+"

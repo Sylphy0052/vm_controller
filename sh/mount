@@ -1,0 +1,5 @@
+#!/bin/bash
+
+mount_ip=$1
+
+sudo mount -t nfs ${mount_ip}:/opt/nfs /mnt

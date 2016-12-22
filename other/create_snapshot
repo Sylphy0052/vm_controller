@@ -1,0 +1,5 @@
+#!/bin/bash
+
+name = $1
+
+qemu-img create -b /mnt/image.qcow2 -f qcow2 /home/pi/diff${name}.qcow2

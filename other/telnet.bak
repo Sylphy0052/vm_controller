@@ -1,0 +1,13 @@
+#!/bin/bash
+
+get_ipaddrs() {
+  echo 
+  ifconfig -a                                       |
+  grep inet[^6]                                     | 
+  sed 's/.*inet[^6][^0-9]*\([0-9.]*\)[^0-9]*.*/\1/' | 
+  grep -v '^127\.'
+}
+
+ip=`get_ipaddrs`
+
+telnet $ip 4444

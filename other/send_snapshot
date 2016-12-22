@@ -1,0 +1,5 @@
+#!/bin/bash
+
+toip=$1
+
+sshpass -p raspberry scp -o StrictHostKeyChecking=no /home/pi/diff.qcow2 pi@${toip}:~
