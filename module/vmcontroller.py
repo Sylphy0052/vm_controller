@@ -341,11 +341,13 @@ def _get_my_ip():
 			continue
 		else:
 			net_name = name
+			print(name)
 			break
 
-		info = netifaces.ifaddresses(net_name).get(netifaces.AF_INET)
-		print(info)
-		return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
+	print(net_name)
+	info = netifaces.ifaddresses(net_name).get(netifaces.AF_INET)
+	print(info)
+	return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
 
 def _print_info():
 	sql = 'select id, ipadd, type, cpu, mem from ipdata'
