@@ -448,6 +448,8 @@ def add(ip):
 	if not os.path.isfile(_ipdata):
 		_create_db()
 
+	_add_ssh(ip)
+	
 	command = '''
 	sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2} 
 	/home/pi/sh/mount {3}
@@ -458,7 +460,6 @@ def add(ip):
 	p = _exec_process(command)
 	p.wait()
 
-	_add_ssh(ip)
 	_update_info(ip)
 	_time_end()
 
