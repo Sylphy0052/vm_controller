@@ -85,7 +85,7 @@ class VmData():
 def _add_ssh(ip):
 	command = '''
 	ssh-keygen -f 
-	"~/.ssh/known_hosts" 
+	"/home/pi/.ssh/known_hosts" 
 	-R {0}'''.format(ip)
 	p = _exec_process(command)
 	try:
@@ -449,7 +449,7 @@ def add(ip):
 		_create_db()
 
 	_add_ssh(ip)
-	
+
 	command = '''
 	sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2} 
 	/home/pi/sh/mount {3}
