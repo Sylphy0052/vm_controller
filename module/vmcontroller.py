@@ -146,7 +146,7 @@ def _confirm_connection(ip):
 			break
 
 		if not line and p.poll() != None:
-			_update_info(ip)
+			# _update_info(ip)
 			break
 
 def _create_db():
@@ -367,7 +367,8 @@ def _print_info():
 		[vmdata]\n{0:^5}|{1:^15}|{2:^15}|{3:^10}
 		'''.format("id", "ipaddress", "vmipaddress", "telnetport"))
 	for row in vm_data_list:
-		print('{0:^5}|{1:^15}|{2:^15}|{3:^10}'.format(row[0], row[1], row[2], row[3]))
+		if str(row[1]) != str(-1):
+			print('{0:^5}|{1:^15}|{2:^15}|{3:^10}'.format(row[0], row[1], row[2], row[3]))
 	line = "=" * 50
 	print('\n{0}'.format(line))
 
@@ -402,13 +403,14 @@ def _update_info(ip):
 	type = _get_dbinfo(_ipdata, sql)
 	
 	if type == [] or type[0][0] == 1:
+		pass
 		command = '''
 		sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2} 
-		python /mnt/py/getHardInfo.py
+		python ~/getResourceText.py &
 		'''.format(_pass, _usr, ip)
 		
-		p = _exec_process(command)
-		p.wait()
+		# p = _exec_process(command)
+		# p.wait()
 
 
 	elif type[0][0] == 2:

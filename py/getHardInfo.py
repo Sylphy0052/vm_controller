@@ -6,6 +6,7 @@ import socket
 import sqlite3
 import struct
 import sys
+import threading
 
 _ipdata = '/mnt/ipdata.db'
 _vmdata = '/mnt/vmdata.db'
@@ -95,21 +96,29 @@ def _is_my_ip(my_ip):
 	conn.close()
 	return False
 
-if __name__ == '__main__':
+def main():
 	type = 1
-	cpu = psutil.cpu_percent()
-	mem = psutil.virtual_memory().percent
+        cpu = psutil.cpu_percent()
+        mem = psutil.virtual_memory().percent
 
-	print('cpu: {0} mem: {1}'.format(cpu, mem))
+        # print('cpu: {0} mem: {1}'.format(cpu, mem))
 
-	my_ip = _get_my_ip()
+        my_ip = _get_my_ip()
 
-	if _is_my_ip(my_ip):
-		sql = 'update ipdata set cpu = ?, mem = ? where ipadd = ?'
-		val = (cpu, mem, my_ip)
-		_exec_sql(_ipdata, sql, val)
+        if _is_my_ip(my_ip):
+                sql = 'update ipdata set cpu = ?, mem = ? where ipadd = ?'
+                val = (cpu, mem, my_ip)
+                _exec_sql(_ipdata, sql, val)
 
-	else:
-		sql = 'insert into ipdata (ipadd, type, cpu, mem) values (?, ?, ?, ?)'
-		val = (my_ip, type, cpu, mem)
-		_exec_sql(_ipdata, sql, val)
+        else:
+                sql = 'insert into ipdata (ipadd, type, cpu, mem) values (?, ?, ?, ?)'
+                val = (my_ip, type, cpu, mem)
+                _exec_sql(_ipdata, sql, val)
+
+	t = threading.Timer(1, main)
+	t.start()
+
+if __name__ == '__main__':
+	# main()
+	t = threading.Thread(target=main)
+	t.start()
