@@ -114,8 +114,8 @@ def _check_config():
 		_config()
 
 def _config():
-	global _my_ip, _my_mask, _config_flg
-	_my_ip, _my_mask = _get_my_ip()
+	global _config_flg
+	_get_my_ip()
 	_config_net_ip()
 	_all_mount()
 	_config_flg = True
@@ -196,17 +196,17 @@ def _create_db():
 
 def _define_vm_net(pm_ip):
 	net_ip = ipaddress.ip_address(int(pm_ip) & int(_my_mask))
-    net_split = str(net_ip).split('.')
-    for i in range(4):
-    	if net_split[i] == str(0):
-    		break
-    	net_ip += net_split[i]
-    	if i == 3:
-    		break
-    	net_ip += '.'
-        
-    print('net_ip: {0}'.format(net_ip))
-    return net_ip
+	net_split = str(net_ip).split('.')
+	for i in range(4):
+		if net_split[i] == str(0):
+			break
+		net_ip += net_split[i]
+		if i == 3:
+			break
+		net_ip += '.'
+
+	print('net_ip: {0}'.format(net_ip))
+	return net_ip
 
 def _define_vm_ip(pm_ip):
 	sql = 'select ipadd from ipdata where ipadd <> "-1" order by ipadd desc'
@@ -349,6 +349,7 @@ def _get_dbinfo_by_id(db, id):
 	return ip_list[0]
 
 def _get_my_ip():
+    global _my_ip, _my_mask
 	net_name = ''
 	for name in netifaces.interfaces():
 		if name.count('lo') != 0:
@@ -361,7 +362,9 @@ def _get_my_ip():
 
 		info = netifaces.ifaddresses(net_name).get(netifaces.AF_INET)
 		print(info)
-		return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
+		_my_ip = ipaddress.ip_address(info[0]['addr'])
+		_my_mask = ipaddress.ip_address(info[0]['netmask'])
+		# return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
 
 def _print_info():
 	sql = 'select id, ipadd, type, cpu, mem from ipdata'
