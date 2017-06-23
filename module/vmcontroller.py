@@ -39,7 +39,7 @@ class Config():
 	def clone_set_mem(self, mem):
 		self.clone_mem = mem
 
-	
+
 
 
 class IpData():
@@ -81,11 +81,11 @@ class VmData():
 		print('[vmdata]\n{0:^5}|{1:^15}|{2:^15}|{3:^10}'.format("id", "ipaddress", "vmipaddress", "telnetport"))
 		print('{0:^5}|{1:^15}|{2:^15}|{3:^10}'.format(self.id, self.ip, self.vmip, self.port))
 		print()
-		
+
 def _add_ssh(ip):
 	command = '''
-	ssh-keygen -f 
-	"/home/pi/.ssh/known_hosts" 
+	ssh-keygen -f
+	"/home/sylphy/.ssh/known_hosts"
 	-R {0}'''.format(ip)
 	p = _exec_process(command)
 	try:
@@ -102,7 +102,7 @@ def _all_mount():
 	print(ip_list)
 	for ip in ip_list:
 		command = '''
-		sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2} 
+		sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2}
 		/home/pi/sh/mount {3}
 		'''.format(_pass, _usr, ip, _my_ip)
 
@@ -158,43 +158,57 @@ def _create_db():
 
 		create_table = '''
 		create table ipdata (
-		id integer primary key, 
-		ipadd text, 
-		type integer, 
-		cpu real, 
+		id integer primary key,
+		ipadd text,
+		type integer,
+		cpu real,
 		mem real
 		)'''
 
 		c.execute(create_table)
-		
+
 	if not os.path.isfile(_vmdata):
 		conn = sqlite3.connect(_vmdata)
 		c = conn.cursor()
 
 		create_table = '''
 		create table vmdata (
-		id integer primary key, 
-		ipadd text, 
-		vmip text, 
+		id integer primary key,
+		ipadd text,
+		vmip text,
 		telnet_port integer
 		)'''
 
 		c.execute(create_table)
-		
+
 	if not os.path.isfile(_clonedata):
 		conn = sqlite3.connect(_clonedata)
 		c = conn.cursor()
 
 		create_table =  '''
 		create table clonedata (
-		id integer primary key, 
-		from_ip text, 
+		id integer primary key,
+		from_ip text,
 		to_ip text
 		)'''
 
 		c.execute(create_table)
 
-def _define_vm_ip():
+def _define_vm_net(pm_ip):
+	net_ip = ipaddress.ip_address(int(pm_ip) & int(_my_mask))
+    net_split = str(net_ip).split('.')
+    for i in range(4):
+    	if net_split[i] == str(0):
+    		break
+    	net_ip += net_split[i]
+    	if i == 3:
+    		break
+    	net_ip += '.'
+        
+    print('net_ip: {0}'.format(net_ip))
+    return net_ip
+
+def _define_vm_ip(pm_ip):
 	sql = 'select ipadd from ipdata where ipadd <> "-1" order by ipadd desc'
 	ip_list = []
 	for ip in _get_dbinfo(_ipdata, sql):
@@ -203,14 +217,16 @@ def _define_vm_ip():
 	least_ip = int(ip_list[0].split('.')[3]) + 1
 	print('ip:', least_ip)
 
-	print(ip_list)	
+    net_ip = _define_vm_net(pm_ip)
+
+	print(ip_list)
 	for i in range(least_ip, 255):
-		ip = _net_ip + str(i)
+		ip = net_ip + str(i)
 		if ip_list.count(ip) == 0:
 			print('checking: {0}'.format(ip))
 			command = 'ping -c 1 {0}'.format(ip)
 			p = _exec_process(command)
-			
+
 			while True:
 				line = p.stdout.readline().decode()
 				if line.count('Unreachable') or line.count('100%'):
@@ -250,16 +266,16 @@ def _delete_ip_info(ip):
 def _delete_ip_data(ip):
 	sql = 'delete from ipdata where ipadd = "{0}"'.format(ip)
 	_exec_sql(_ipdata, sql)
-	
+
 def _delete_vm_data(ip):
 	sql = 'select id, ipadd from vmdata where vmip = "{0}"'.format(ip)
 	ip_data = _get_dbinfo(_vmdata, sql)[0]
 
 	vm_id = ip_data[0]
-	running_ip = ip_data[1] 
+	running_ip = ip_data[1]
 
 	command = '''
-	sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2} 
+	sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2}
 	rm diff{3}.qcow2
 	'''.format(_pass, _usr, running_ip, vm_id)
 	print(command)
@@ -294,7 +310,7 @@ def _exec_sql(db, sql):
 	c.execute(sql)
 	conn.commit()
 	conn.close()
-	
+
 	return
 
 def _exec_sql_by_val(db, sql, val):
@@ -307,7 +323,7 @@ def _exec_sql_by_val(db, sql, val):
 	c.execute(sql, val)
 	conn.commit()
 	conn.close()
-	
+
 	return
 
 def _get_dbinfo(db, sql):
@@ -341,13 +357,11 @@ def _get_my_ip():
 			continue
 		else:
 			net_name = name
-			print(name)
 			break
 
-	print(net_name)
-	info = netifaces.ifaddresses(net_name).get(netifaces.AF_INET)
-	print(info)
-	return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
+		info = netifaces.ifaddresses(net_name).get(netifaces.AF_INET)
+		print(info)
+		return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
 
 def _print_info():
 	sql = 'select id, ipadd, type, cpu, mem from ipdata'
@@ -367,8 +381,7 @@ def _print_info():
 		[vmdata]\n{0:^5}|{1:^15}|{2:^15}|{3:^10}
 		'''.format("id", "ipaddress", "vmipaddress", "telnetport"))
 	for row in vm_data_list:
-		if str(row[1]) != str(-1):
-			print('{0:^5}|{1:^15}|{2:^15}|{3:^10}'.format(row[0], row[1], row[2], row[3]))
+		print('{0:^5}|{1:^15}|{2:^15}|{3:^10}'.format(row[0], row[1], row[2], row[3]))
 	line = "=" * 50
 	print('\n{0}'.format(line))
 
@@ -401,16 +414,15 @@ def _update_data():
 def _update_info(ip):
 	sql = 'select type from ipdata where ipadd = "{0}"'.format(ip)
 	type = _get_dbinfo(_ipdata, sql)
-	
+
 	if type == [] or type[0][0] == 1:
-		pass
 		command = '''
-		sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2} 
-		python ~/getResourceText.py &
+		sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2}
+		python /mnt/py/getHardInfo.py
 		'''.format(_pass, _usr, ip)
-		
-		# p = _exec_process(command)
-		# p.wait()
+
+		p = _exec_process(command)
+		p.wait()
 
 
 	elif type[0][0] == 2:
@@ -418,8 +430,8 @@ def _update_info(ip):
 
 def _update_vm_info(vm_ip):
 	command = '''
-	sshpass -p {0} ssh -t -o StrictHostKeyChecking=no 
-	{1}@{2} 
+	sshpass -p {0} ssh -t -o StrictHostKeyChecking=no
+	{1}@{2}
 	top -d 60
 	'''.format(_vm_pass, _vm_usr, vm_ip)
 
@@ -450,10 +462,8 @@ def add(ip):
 	if not os.path.isfile(_ipdata):
 		_create_db()
 
-	_add_ssh(ip)
-
 	command = '''
-	sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2} 
+	sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2}
 	/home/pi/sh/mount {3}
 	'''.format(_pass, _usr, ip, _my_ip)
 
@@ -462,6 +472,7 @@ def add(ip):
 	p = _exec_process(command)
 	p.wait()
 
+	_add_ssh(ip)
 	_update_info(ip)
 	_time_end()
 
@@ -485,10 +496,10 @@ def clone(vm_id, to_id):
 	to_vm_port = _define_vm_port()
 
 	command = """
-	sshpass -p {0} 
-	ssh -o StrictHostKeyChecking=no {1}@{2} 
-	sshpass -p {3} 
-	scp -o StrictHostKeyChecking=no 
+	sshpass -p {0}
+	ssh -o StrictHostKeyChecking=no {1}@{2}
+	sshpass -p {3}
+	scp -o StrictHostKeyChecking=no
 	/home/pi/diff{4}.qcow2 {5}@{6}:~
 	""".format(_pass, _usr, from_ip, _pass, vm_id, _usr, to_ip)
 
@@ -511,8 +522,8 @@ def clone(vm_id, to_id):
 	_exec_sql_by_val(_ipdata, sql, val)
 
 	command = """
-	sshpass -p {0} 
-	ssh -o StrictHostKeyChecking=no 
+	sshpass -p {0}
+	ssh -o StrictHostKeyChecking=no
 	{1}@{2} python /mnt/py/clone_start.py {3} {4} {5} {6}
 	""".format(_pass, _usr, to_ip, vm_id, to_vm_id, to_vm_ip, to_vm_port)
 
@@ -554,7 +565,7 @@ def get_cpu_least():
 
 	sql = 'select * from ipdata where type = 1 order by cpu asc limit 1'
 	data_list = _get_dbinfo(_ipdata, sql)
-	
+
 	if len(data_list) == 0:
 		return None
 
@@ -598,7 +609,7 @@ def get_vm_info_by_id(id):
 	sql = 'select id from vmdata where ipadd = {0}'.format(ip)
 	data_list = _exec_sql(_vmdata, sql)
 	return data_list[0][0]
-	
+
 def get_mem_larger_than_val(val):
 	_check_config()
 	_update_data()
@@ -624,7 +635,7 @@ def get_mem_least():
 
 	sql = 'select * from ipdata where type = 1 order by mem asc limit 1'
 	data_list = _get_dbinfo(_ipdata, sql)
-	
+
 	if len(data_list) == 0:
 		return None
 
@@ -663,10 +674,10 @@ def migrate(vm_id, to_id):
 	to_vm_port = _define_vm_port()
 
 	command = '''
-	sshpass -p {0} 
-	ssh -o StrictHostKeyChecking=no {1}@{2} 
-	sshpass -p {3} 
-	scp -o StrictHostKeyChecking=no 
+	sshpass -p {0}
+	ssh -o StrictHostKeyChecking=no {1}@{2}
+	sshpass -p {3}
+	scp -o StrictHostKeyChecking=no
 	/home/pi/diff{4}.qcow2 {5}@{6}:~
 	'''.format(_pass, _usr, from_ip, _pass, vm_id, _usr, to_ip)
 
@@ -678,8 +689,8 @@ def migrate(vm_id, to_id):
 
 	print('migration')
 	command = '''
-	sshpass -p {0} 
-	ssh -o StrictHostKeyChecking=no 
+	sshpass -p {0}
+	ssh -o StrictHostKeyChecking=no
 	{1}@{2} python /mnt/py/migrate_start.py {3} {4}
 	'''.format(_pass, _usr, from_ip, vm_id, to_vm_port)
 	p = _exec_process(command)
@@ -687,11 +698,11 @@ def migrate(vm_id, to_id):
 		p.wait(timeout = 10)
 	except TimeoutExpired:
 		pass
-	
+
 	print('telnet')
 	command = '''
-	sshpass -p {0} 
-	ssh -o StrictHostKeyChecking=no 
+	sshpass -p {0}
+	ssh -o StrictHostKeyChecking=no
 	{1}@{2} python /mnt/py/telnet.py {3} {4}
 	'''.format(_pass, _usr, from_ip, to_ip, vm_port)
 	p = _exec_process(command)
@@ -701,7 +712,7 @@ def migrate(vm_id, to_id):
 		print('migrate error')
 
 	sql = '''
-	update vmdata set ipadd = ?, vmip = ? 
+	update vmdata set ipadd = ?, vmip = ?
 	where vmip = ?
 	'''
 	val = (str(-1), str(-1), vm_ip)
@@ -714,8 +725,8 @@ def migrate(vm_id, to_id):
 	_exec_sql_by_val(_vmdata, sql, val)
 
 	command = '''
-	sshpass -p {0} 
-	ssh -o StrictHostKeyChecking=no {1}@{2} 
+	sshpass -p {0}
+	ssh -o StrictHostKeyChecking=no {1}@{2}
 	rm /home/pi/diff{3}.qcow2
 	'''.format(_pass, _usr, from_ip, vm_id)
 	p = _exec_process(command)
@@ -736,7 +747,7 @@ def start_vm(id):
 		print('Not VM_Machine.')
 		return
 	ip = _get_dbinfo_by_id(_ipdata, id)[1]
-	vm_ip = _define_vm_ip()
+	vm_ip = _define_vm_ip(ip)
 	vm_port = _define_vm_port()
 
 	print('vm start {0} on {1} port:{2}'.format(ip, vm_ip, vm_port))
@@ -750,7 +761,7 @@ def start_vm(id):
 	_exec_sql_by_val(_ipdata, sql, val)
 
 	command = '''
-	sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2} 
+	sshpass -p {0} ssh -o StrictHostKeyChecking=no {1}@{2}
 	python /mnt/py/start.py {3} {4} {5}
 	'''.format(_pass, _usr, ip, ip, vm_ip, vm_port)
 	print(command)
