@@ -17,7 +17,7 @@ def _create_snapshot(ip, vm_ip):
 	vm_id = _get_dbinfo(_vmdata, sql)[0][0]
 
 	command = '''
-	qemu-img create -b /mnt/image.qcow2 
+	qemu-img create -b /mnt/image.qcow2
 	-f qcow2 /home/pi/diff{0}.qcow2
 	'''.format(str(vm_id))
 
@@ -47,7 +47,7 @@ def _exec_sql(db, sql):
 	c.execute(sql)
 	conn.commit()
 	conn.close()
-	
+
 	return
 
 def _exec_sql_by_val(db, sql, val):
@@ -56,7 +56,7 @@ def _exec_sql_by_val(db, sql, val):
 	c.execute(sql, val)
 	conn.commit()
 	conn.close()
-	
+
 	return
 
 def _get_dbinfo(db, sql):
@@ -77,7 +77,7 @@ def _is_my_info(ip):
  		return False
  	else:
  		return True
- 	
+
 def _is_start(p):
 	while True:
 		line = p.stdout.readline()
@@ -96,39 +96,39 @@ def _is_start(p):
 	return False
 
 # def _update_vm_info(vm_ip):
-	command = '''
-	sshpass -p {0} ssh -o StrictHostKeyChecking=no 
-	{1}@{2} 
-	top -d 60
-	'''.format(_vm_pass, _vm_usr, vm_ip)
-
-	args = shlex.split(command)
-
-	p = subprocess.Popen(args, stdout=subprocess.PIPE)
-	i = 0
-	while True:
-		line = p.stdout.readline().decode()
-		if i ==2:
-			split = shlex.split(line)
-			print(split)
-			cpu = float(100) - float(split[7])
-		elif i == 3:
-			split = shlex.split(line)
-			print(split)
-			mem = float(split[7]) / float(split[3]) * 100
-		i += 1
-		if i == 4:
-			break
-
-	if _is_my_info(vm_ip):
-		sql = 'update ipdata set cpu = ?, mem = ? where ipadd = ?'
-		val = (cpu, mem, vm_ip)
-		_exec_sql_by_val(_ipdata, sql, val)
-
-	else:
-		sql = 'insert into ipdata (ipadd, type, cpu, mem) values (?, ?, ?, ?)'
-		val = (vm_ip, 2, cpu, mem)
-		_exec_sql_by_val(_ipdata, sql, val)
+	# command = '''
+	# sshpass -p {0} ssh -o StrictHostKeyChecking=no
+	# {1}@{2}
+	# top -d 60
+	# '''.format(_vm_pass, _vm_usr, vm_ip)
+    #
+	# args = shlex.split(command)
+    #
+	# p = subprocess.Popen(args, stdout=subprocess.PIPE)
+	# i = 0
+	# while True:
+	# 	line = p.stdout.readline().decode()
+	# 	if i ==2:
+	# 		split = shlex.split(line)
+	# 		print(split)
+	# 		cpu = float(100) - float(split[7])
+	# 	elif i == 3:
+	# 		split = shlex.split(line)
+	# 		print(split)
+	# 		mem = float(split[7]) / float(split[3]) * 100
+	# 	i += 1
+	# 	if i == 4:
+	# 		break
+    #
+	# if _is_my_info(vm_ip):
+	# 	sql = 'update ipdata set cpu = ?, mem = ? where ipadd = ?'
+	# 	val = (cpu, mem, vm_ip)
+	# 	_exec_sql_by_val(_ipdata, sql, val)
+    #
+	# else:
+	# 	sql = 'insert into ipdata (ipadd, type, cpu, mem) values (?, ?, ?, ?)'
+	# 	val = (vm_ip, 2, cpu, mem)
+	# 	_exec_sql_by_val(_ipdata, sql, val)
 
 if __name__ == '__main__':
 	args = sys.argv

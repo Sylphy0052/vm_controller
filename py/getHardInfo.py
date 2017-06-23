@@ -6,7 +6,6 @@ import socket
 import sqlite3
 import struct
 import sys
-import threading
 
 _ipdata = '/mnt/ipdata.db'
 _vmdata = '/mnt/vmdata.db'
@@ -21,14 +20,14 @@ def _create_db():
 
 		create_table = 'create table ipdata (id integer primary key, ipadd, type, cpu, mem)'
 		c.execute(create_table)
-		
+
 	if not os.path.isfile(_vmdata):
 		conn = sqlite3.connect(_vmdata)
 		c = conn.cursor()
 
 		create_table = 'create table vmdata (id integer primary key, ipadd, vmip, telnet_port)'
 		c.execute(create_table)
-		
+
 	if not os.path.isfile(_clonedata):
 		conn = sqlite3.connect(_clonedata)
 		c = conn.cursor()
@@ -45,7 +44,7 @@ def _exec_sql(db, sql, val):
 	c.execute(sql, val)
 	conn.commit()
 	conn.close()
-	
+
 	return
 
 def _get_my_ip():
@@ -58,7 +57,7 @@ def _get_my_ip():
 		names = array.array('B', b'\0' * bytes)
 		outbytes = struct.unpack('iL', fcntl.ioctl(
 			s.fileno(),
-			0x8912, 
+			0x8912,
 			struct.pack('iL', bytes, names.buffer_info()[0])
 		))[0]
 		if outbytes == bytes:
@@ -77,7 +76,7 @@ def _get_my_ip():
 		_netmask = fcntl.ioctl(s.fileno(), 0x891b, struct.pack('256s', iface_name[:15]))
 		result_dict['netmask'] = socket.inet_ntoa(_netmask[20:24])
 		result_list.append(result_dict)
-		
+
 	return result_list[0]['ip']
 
 def _is_my_ip(my_ip):
@@ -97,28 +96,26 @@ def _is_my_ip(my_ip):
 	return False
 
 def main():
-	type = 1
-        cpu = psutil.cpu_percent()
-        mem = psutil.virtual_memory().percent
+    type = 1
+	cpu = psutil.cpu_percent()
+	mem = psutil.virtual_memory().percent
 
-        # print('cpu: {0} mem: {1}'.format(cpu, mem))
+	print('cpu: {0} mem: {1}'.format(cpu, mem))
 
-        my_ip = _get_my_ip()
+	my_ip = _get_my_ip()
 
-        if _is_my_ip(my_ip):
-                sql = 'update ipdata set cpu = ?, mem = ? where ipadd = ?'
-                val = (cpu, mem, my_ip)
-                _exec_sql(_ipdata, sql, val)
+	if _is_my_ip(my_ip):
+		sql = 'update ipdata set cpu = ?, mem = ? where ipadd = ?'
+		val = (cpu, mem, my_ip)
+		_exec_sql(_ipdata, sql, val)
 
-        else:
-                sql = 'insert into ipdata (ipadd, type, cpu, mem) values (?, ?, ?, ?)'
-                val = (my_ip, type, cpu, mem)
-                _exec_sql(_ipdata, sql, val)
-
-	t = threading.Timer(1, main)
-	t.start()
+	else:
+		sql = 'insert into ipdata (ipadd, type, cpu, mem) values (?, ?, ?, ?)'
+		val = (my_ip, type, cpu, mem)
+		_exec_sql(_ipdata, sql, val)
+    t=threading.Timer(1, main)
+    t.start()
 
 if __name__ == '__main__':
-	# main()
 	t = threading.Thread(target=main)
-	t.start()
+    t.start()
