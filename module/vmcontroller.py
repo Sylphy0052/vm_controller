@@ -361,12 +361,13 @@ def _get_my_ip():
 			net_name = name
 			break
 
-		info = netifaces.ifaddresses(net_name).get(netifaces.AF_INET)
-		print(info)
-		_my_ip = ipaddress.ip_address(info[0]['addr'])
-		_my_mask = ipaddress.ip_address(info[0]['netmask'])
-		print("my_ip : " + _my_ip + " / my_mask : " + _my_mask)
-		# return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
+	info = netifaces.ifaddresses(net_name).get(netifaces.AF_INET)
+	print(info)
+	_my_ip = ipaddress.ip_address(info[0]['addr'])
+	_my_mask = ipaddress.ip_address(info[0]['netmask'])
+
+	print("my_ip : " + _my_ip + " / my_mask : " + _my_mask)
+	# return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
 
 def _print_info():
 	sql = 'select id, ipadd, type, cpu, mem from ipdata'
