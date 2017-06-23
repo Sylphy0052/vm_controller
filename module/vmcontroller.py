@@ -365,6 +365,7 @@ def _get_my_ip():
 		print(info)
 		_my_ip = ipaddress.ip_address(info[0]['addr'])
 		_my_mask = ipaddress.ip_address(info[0]['netmask'])
+		print("my_ip : " + _my_ip + " / my_mask : " + _my_mask)
 		# return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
 
 def _print_info():
