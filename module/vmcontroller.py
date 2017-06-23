@@ -122,6 +122,7 @@ def _config():
 
 def _config_net_ip():
 	global _net_ip
+	print(_my_ip + " : " + _my_mask)
 	net_ip = ipaddress.ip_address(int(_my_ip) & int(_my_mask))
 	net_split = str(net_ip).split('.')
 	for i in range(4):
