@@ -217,7 +217,7 @@ def _define_vm_ip(pm_ip):
 	least_ip = int(ip_list[0].split('.')[3]) + 1
 	print('ip:', least_ip)
 
-    net_ip = _define_vm_net(pm_ip)
+	net_ip = _define_vm_net(pm_ip)
 
 	print(ip_list)
 	for i in range(least_ip, 255):
@@ -349,7 +349,7 @@ def _get_dbinfo_by_id(db, id):
 	return ip_list[0]
 
 def _get_my_ip():
-    global _my_ip, _my_mask
+	global _my_ip, _my_mask
 	net_name = ''
 	for name in netifaces.interfaces():
 		if name.count('lo') != 0:
