@@ -10,6 +10,8 @@ import threading
 
 _my_ip = ''
 _my_mask = ''
+#_my_ip = '192.10.1.15'
+#_my_mask = '255.255.255.0'
 _net_ip = ''
 
 _usr = 'pi'
@@ -122,7 +124,7 @@ def _config():
 
 def _config_net_ip():
 	global _net_ip
-	print(_my_ip + " : " + _my_mask)
+	# print(_my_ip + " : " + _my_mask)
 	net_ip = ipaddress.ip_address(int(_my_ip) & int(_my_mask))
 	net_split = str(net_ip).split('.')
 	for i in range(4):
@@ -196,18 +198,20 @@ def _create_db():
 		c.execute(create_table)
 
 def _define_vm_net(pm_ip):
+	pm_ip = ipaddress.ip_address(pm_ip)
 	net_ip = ipaddress.ip_address(int(pm_ip) & int(_my_mask))
 	net_split = str(net_ip).split('.')
+	ret = ''
 	for i in range(4):
 		if net_split[i] == str(0):
 			break
-		net_ip += net_split[i]
+		ret += net_split[i]
 		if i == 3:
 			break
-		net_ip += '.'
+		ret += '.'
 
-	print('net_ip: {0}'.format(net_ip))
-	return net_ip
+	print('net_ip: {0}'.format(ret))
+	return ret
 
 def _define_vm_ip(pm_ip):
 	sql = 'select ipadd from ipdata where ipadd <> "-1" order by ipadd desc'
@@ -366,8 +370,8 @@ def _get_my_ip():
 	_my_ip = ipaddress.ip_address(info[0]['addr'])
 	_my_mask = ipaddress.ip_address(info[0]['netmask'])
 
-	print("my_ip : " + _my_ip + " / my_mask : " + _my_mask)
-	# return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
+	# print("my_ip : " + _my_ip + " / my_mask : " + _my_mask)
+	return ipaddress.ip_address(info[0]['addr']), ipaddress.ip_address(info[0]['netmask'])
 
 def _print_info():
 	sql = 'select id, ipadd, type, cpu, mem from ipdata'
