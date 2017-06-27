@@ -39,9 +39,6 @@ class Config():
 	def clone_set_mem(self, mem):
 		self.clone_mem = mem
 
-
-
-
 class IpData():
 	def __init__(self):
 		self.id = ''
