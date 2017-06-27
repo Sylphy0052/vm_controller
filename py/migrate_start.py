@@ -1,5 +1,6 @@
 import subprocess
 from subprocess import PIPE
+import shlex
 import sys
 
 def _exec_process(command):
