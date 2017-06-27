@@ -27,7 +27,7 @@ def _exec_sql(db, sql):
 	c.execute(sql)
 	conn.commit()
 	conn.close()
-	
+
 	return
 
 def _exec_sql_by_val(db, sql, val):
@@ -36,7 +36,7 @@ def _exec_sql_by_val(db, sql, val):
 	c.execute(sql, val)
 	conn.commit()
 	conn.close()
-	
+
 	return
 
 def _get_dbinfo(db, sql):
@@ -119,6 +119,7 @@ if __name__ == '__main__':
 			sql = 'select id from vmdata where vmip = "{0}"'.format(vm_ip)
 			new_vm_id = _get_dbinfo(_vmdata, sql)[0][0]
 			_rename_img_file(vm_id, new_vm_id)
+            vm_id = new_vm_id
 
 			command = '/mnt/sh/start {0} {1} {2}'.format(vm_ip, vm_port, vm_id)
 			p = _exec_process(command)
