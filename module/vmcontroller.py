@@ -679,7 +679,7 @@ def migrate(vm_id, to_id):
 
 	vm_port = vm_data[3]
 	to_vm_port = _define_vm_port()
-    to_vm_ip = _define_vm_ip(to_ip)
+	to_vm_ip = _define_vm_ip(to_ip)
 
 	command = '''
 	sshpass -p {0}
