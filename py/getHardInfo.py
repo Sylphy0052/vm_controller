@@ -96,7 +96,7 @@ def _is_my_ip(my_ip):
 	return False
 
 def main():
-    type = 1
+	type = 1
 	cpu = psutil.cpu_percent()
 	mem = psutil.virtual_memory().percent
 
@@ -113,9 +113,9 @@ def main():
 		sql = 'insert into ipdata (ipadd, type, cpu, mem) values (?, ?, ?, ?)'
 		val = (my_ip, type, cpu, mem)
 		_exec_sql(_ipdata, sql, val)
-    t=threading.Timer(1, main)
-    t.start()
+	t=threading.Timer(1, main)
+	t.start()
 
 if __name__ == '__main__':
 	t = threading.Thread(target=main)
-    t.start()
+	t.start()
