@@ -12,7 +12,7 @@ _vmdata = '/mnt/vmdata.db'
 _clonedata = '/mnt/clonedata.db'
 
 def _create_db():
-	print('db create')
+	# print('db create')
 
 	if not os.path.isfile(_ipdata):
 		conn = sqlite3.connect(_ipdata)
@@ -100,7 +100,7 @@ def main():
 	cpu = psutil.cpu_percent()
 	mem = psutil.virtual_memory().percent
 
-	print('cpu: {0} mem: {1}'.format(cpu, mem))
+	# print('cpu: {0} mem: {1}'.format(cpu, mem))
 
 	my_ip = _get_my_ip()
 
