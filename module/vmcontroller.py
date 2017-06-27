@@ -495,7 +495,7 @@ def clone(vm_id, to_id):
 
 	print('clone run... from {0} on {1} to {2}'.format(vm_ip, from_ip, to_ip))
 
-	to_vm_ip = _define_vm_ip()
+	to_vm_ip = _define_vm_ip(to_ip)
 	to_vm_port = _define_vm_port()
 
 	command = """
@@ -675,6 +675,7 @@ def migrate(vm_id, to_id):
 
 	vm_port = vm_data[3]
 	to_vm_port = _define_vm_port()
+    to_vm_ip = _define_vm_ip(to_ip)
 
 	command = '''
 	sshpass -p {0}
@@ -694,8 +695,8 @@ def migrate(vm_id, to_id):
 	command = '''
 	sshpass -p {0}
 	ssh -o StrictHostKeyChecking=no
-	{1}@{2} python /mnt/py/migrate_start.py {3} {4}
-	'''.format(_pass, _usr, from_ip, vm_id, to_vm_port)
+	{1}@{2} python /mnt/py/migrate_start.py {3} {4} {5}
+	'''.format(_pass, _usr, from_ip, vm_id, to_vm_port, to_vm_ip)
 	p = _exec_process(command)
 	try:
 		p.wait(timeout = 10)

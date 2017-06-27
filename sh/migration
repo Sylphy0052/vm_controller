@@ -2,12 +2,16 @@
 
 img_file=$1
 telnet_port=$2
+vm_ip=$3
 tcp_port="4449"
 
 echo ${img_file}
 echo ${telnet_port}
+echo ${vm_ip}
 
-sudo qemu-system-arm -enable-kvm -smp 1 -m 256 -M vexpress-a15 \
+expect -c "
+set timeout 100
+spawn sudo qemu-system-arm -enable-kvm -smp 1 -m 256 -M vexpress-a15 \
 -cpu host -kernel /mnt/zImage -dtb /mnt/vexpress-v2p-ca15-tc1.dtb \
 -append "root=/dev/vda console=ttyAMA0 rootwait" \
 -drive if=none,file=/home/pi/diff${img_file}.qcow2,id=factory \
@@ -15,3 +19,11 @@ sudo qemu-system-arm -enable-kvm -smp 1 -m 256 -M vexpress-a15 \
 -net nic,macaddr=02:fd:01:de:ad:34 -net tap \
 -monitor telnet::${telnet_port},server,nowait -serial stdio -nographic \
 -incoming tcp:0:${tcp_port}
+expect \"login\"
+send \"root\n\"
+expect \"Password\"
+send \"linux\n\"
+expect \"nohostname:\"
+send \"./start.sh ${vm_ip}\n\"
+interact
+"
