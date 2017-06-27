@@ -538,9 +538,9 @@ def clone(vm_id, to_id):
 
 	p = _exec_process(command)
 	try:
-		p.wait(timeout = 60)
+		p.wait(timeout = 80)
 	except TimeoutExpired:
-		print('clone error')
+		pass
 
 	_add_ssh(vm_ip)
 	_update_vm_info(vm_ip)
@@ -703,7 +703,7 @@ def migrate(vm_id, to_id):
 	'''.format(_pass, _usr, from_ip, vm_id, to_vm_port, to_vm_ip)
 	p = _exec_process(command)
 	try:
-		p.wait(timeout = 10)
+		p.wait(timeout = 30)
 	except TimeoutExpired:
 		pass
 
