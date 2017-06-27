@@ -84,7 +84,7 @@ class VmData():
 def _add_ssh(ip):
 	command = '''
 	ssh-keygen -f
-	"/home/sylphy/.ssh/known_hosts"
+	"/home/pi/.ssh/known_hosts"
 	-R {0}'''.format(ip)
 	p = _exec_process(command)
 	try:
