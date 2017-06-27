@@ -13,7 +13,7 @@ expect -c "
 set timeout 100
 spawn sudo qemu-system-arm -enable-kvm -smp 1 -m 256 -M vexpress-a15 \
 -cpu host -kernel /mnt/zImage -dtb /mnt/vexpress-v2p-ca15-tc1.dtb \
--append "root=/dev/vda console=ttyAMA0 rootwait" \
+-append \"root=/dev/vda console=ttyAMA0 rootwait\" \
 -drive if=none,file=/home/pi/diff${img_file}.qcow2,id=factory \
 -device virtio-blk-device,drive=factory \
 -net nic,macaddr=02:fd:01:de:ad:34 -net tap \
