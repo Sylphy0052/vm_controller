@@ -694,7 +694,7 @@ def migrate(vm_id, to_id):
 		print('migrate error')
 
 	print('migration')
-    print('to vm_ip : {0}'.format(to_vm_ip))
+	print('to vm_ip : {0}'.format(to_vm_ip))
 	command = '''
 	sshpass -p {0}
 	ssh -o StrictHostKeyChecking=no
