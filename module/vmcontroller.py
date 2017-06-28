@@ -488,7 +488,7 @@ def clone(vm_id, to_id):
 
 	from_ip = vm_data[1]
 	to_ip = to_data[1]
-    vm_type = to_data[2]
+	vm_type = to_data[2]
 	vm_ip = vm_data[2]
 
 	if vm_type != 1:
