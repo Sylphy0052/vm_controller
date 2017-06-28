@@ -694,6 +694,7 @@ def migrate(vm_id, to_id):
 		print('migrate error')
 
 	print('migration')
+    print('to vm_ip : {0}'.format(to_vm_ip))
 	command = '''
 	sshpass -p {0}
 	ssh -o StrictHostKeyChecking=no
@@ -727,7 +728,7 @@ def migrate(vm_id, to_id):
 	sql = '''
 	insert into vmdata (ipadd, vmip, telnet_port) values (?, ?, ?)
 	'''
-	val = (to_ip, vm_ip, to_vm_port)
+	val = (to_ip, to_vm_ip, to_vm_port)
 	_exec_sql_by_val(_vmdata, sql, val)
 
 	command = '''
