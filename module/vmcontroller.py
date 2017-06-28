@@ -684,14 +684,12 @@ def migrate(vm_id, to_id):
 	ssh -o StrictHostKeyChecking=no {1}@{2}
 	sshpass -p {3}
 	scp -o StrictHostKeyChecking=no
-	/home/pi/diff{4}.qcow2 {5}@{6}:~
+	/home/pi/diff{4}.qcow2 {5}@{6}:/home/pi/
 	'''.format(_pass, _usr, from_ip, _pass, vm_id, _usr, to_ip)
 
+	print(command)
 	p = _exec_process(command)
-	try:
-		p.wait(timeout = 20)
-	except TimeoutExpired:
-		print('migrate error')
+	p.wait()
 
 	print('migration')
 	print('to vm_ip : {0}'.format(to_vm_ip))
