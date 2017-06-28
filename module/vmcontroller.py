@@ -8,7 +8,8 @@ from subprocess import TimeoutExpired, PIPE
 from time import time
 import threading
 
-_my_ip = ''
+_my_ip1 = ''
+_my_ip2 = ''
 _my_mask = ''
 _net_ip = ''
 
@@ -487,9 +488,10 @@ def clone(vm_id, to_id):
 
 	from_ip = vm_data[1]
 	to_ip = to_data[1]
+    vm_type = to_data[2]
 	vm_ip = vm_data[2]
 
-	if to_data[2] != 1:
+	if vm_type != 1:
 		print('Not VM_Machine')
 		return
 
@@ -534,11 +536,11 @@ def clone(vm_id, to_id):
 
 	p = _exec_process(command)
 	try:
-		p.wait(timeout = 80)
+		p.wait(timeout = 100)
 	except TimeoutExpired:
 		pass
 
-	_add_ssh(vm_ip)
+	_add_ssh(to_vm_ip)
 	_update_vm_info(vm_ip)
 	print('clone complete.')
 	_time_end()

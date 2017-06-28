@@ -132,12 +132,12 @@ def _is_start(p):
 
 if __name__ == '__main__':
 	args = sys.argv
-	print(args)
+	# print(args)
 	ip = args[1]
 	vm_ip = args[2]
 	vm_port = args[3]
 	vm_id = _create_snapshot(ip, vm_ip)
-	print(vm_id)
+	# print(vm_id)
 
 	command = '/mnt/sh/start {0} {1} {2}'.format(vm_ip, vm_port, vm_id)
 
