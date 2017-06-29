@@ -29,6 +29,7 @@ if __name__ == '__main__':
 	vm_port = args[2]
 	vm_ip = args[3]
 	command = '/mnt/sh/migration {0} {1} {2}'.format(vm_id, vm_port, vm_ip)
+	print(command)
 	p = _exec_process(command)
 	if _is_start(p):
 		print("migration complete.")

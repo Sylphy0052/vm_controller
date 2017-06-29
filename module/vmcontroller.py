@@ -715,7 +715,10 @@ def migrate(vm_id, to_id):
 	'''.format(_pass, _usr, to_ip, vm_id, to_vm_port, to_vm_ip)
 
 	p = _exec_process(command)
-	p.wait()
+	try:
+		p.wait(timeout = 50)
+	except TimeoutExpired:
+		pass
 
 	sql = '''
 	update vmdata set ipadd = ?, vmip = ?
