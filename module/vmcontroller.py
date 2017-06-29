@@ -696,26 +696,6 @@ def migrate(vm_id, to_id):
 	p.wait()
 
 	print('migration')
-	print('to vm_ip : {0}'.format(to_vm_ip))
-	# command = '''
-	# sshpass -p {0}
-	# ssh -o StrictHostKeyChecking=no
-	# {1}@{2} python /mnt/py/migrate_start.py {3} {4} {5}
-	# '''.format(_pass, _usr, to_ip, vm_id, to_vm_port, to_vm_ip)
-	command = '''
-	sshpass -p {0}
-	ssh -o StrictHostKeyChecking=no
-	{1}@{2} /mnt/sh/migration {3} {4} {5}
-	'''.format(_pass, _usr, to_ip, vm_id, to_vm_port, to_vm_ip)
-
-	args = shlex.split(command)
-	subprocess.Popen(args)
-
-	# p = _exec_process(command)
-	# try:
-	# 	p.wait(timeout = 10)
-	# except TimeoutExpired:
-	# 	pass
 
 	print('telnet')
 	command = '''
@@ -725,9 +705,18 @@ def migrate(vm_id, to_id):
 	'''.format(_pass, _usr, from_ip, to_ip, vm_port)
 	p = _exec_process(command)
 	try:
-		p.wait(timeout = 90)
+		p.wait(timeout = 5)
 	except TimeoutExpired:
-		print('migrate error')
+		print('telnet')
+
+	command = '''
+	sshpass -p {0}
+	ssh -o StrictHostKeyChecking=no
+	{1}@{2} python /mnt/py/migrate_start.py {3} {4} {5}
+	'''.format(_pass, _usr, to_ip, vm_id, to_vm_port, to_vm_ip)
+
+	p = _exec_process(command)
+	p.wait()
 
 	sql = '''
 	update vmdata set ipadd = ?, vmip = ?
