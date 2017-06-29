@@ -707,11 +707,15 @@ def migrate(vm_id, to_id):
 	ssh -o StrictHostKeyChecking=no
 	{1}@{2} /mnt/sh/migration {3} {4} {5}
 	'''.format(_pass, _usr, to_ip, vm_id, to_vm_port, to_vm_ip)
-	p = _exec_process(command)
-	try:
-		p.wait(timeout = 100)
-	except TimeoutExpired:
-		pass
+
+	args = shlex.split(command)
+	subprocess.Popen(args)
+
+	# p = _exec_process(command)
+	# try:
+	# 	p.wait(timeout = 10)
+	# except TimeoutExpired:
+	# 	pass
 
 	print('telnet')
 	command = '''
