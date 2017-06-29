@@ -701,7 +701,7 @@ def migrate(vm_id, to_id):
 	sshpass -p {0}
 	ssh -o StrictHostKeyChecking=no
 	{1}@{2} python /mnt/py/migrate_start.py {3} {4} {5}
-	'''.format(_pass, _usr, from_ip, vm_id, to_vm_port, to_vm_ip)
+	'''.format(_pass, _usr, to_ip, vm_id, to_vm_port, to_vm_ip)
 	p = _exec_process(command)
 	try:
 		p.wait(timeout = 30)
