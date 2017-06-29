@@ -5,9 +5,7 @@ telnet_port=$2
 vm_ip=$3
 tcp_port="4449"
 
-echo ${img_file}
-echo ${telnet_port}
-echo ${vm_ip}
+echo "${img_file} : ${telnet_port} : ${vm_ip}"
 
 expect -c "
 set timeout 100
