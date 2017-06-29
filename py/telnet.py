@@ -1,4 +1,5 @@
 import telnetlib
+import time
 import sys
 
 def telnet_connection(to_host, telnet_port):
@@ -48,4 +49,5 @@ def telnet_connection(to_host, telnet_port):
 if __name__ == '__main__':
 	to_host = sys.argv[1]
 	telnet_port = sys.argv[2]
+	time.sleep(3)
 	telnet_connection(to_host, telnet_port)

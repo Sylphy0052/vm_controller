@@ -695,8 +695,6 @@ def migrate(vm_id, to_id):
 	p = _exec_process(command)
 	p.wait()
 
-	print('migration')
-
 	print('telnet')
 	command = '''
 	sshpass -p {0}
@@ -705,10 +703,11 @@ def migrate(vm_id, to_id):
 	'''.format(_pass, _usr, from_ip, to_ip, vm_port)
 	p = _exec_process(command)
 	try:
-		p.wait(timeout = 5)
+		p.wait(timeout = 1)
 	except TimeoutExpired:
-		print('telnet')
+		pass
 
+	print('migration')
 	command = '''
 	sshpass -p {0}
 	ssh -o StrictHostKeyChecking=no
