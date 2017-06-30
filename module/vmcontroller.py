@@ -5,7 +5,6 @@ import sqlite3
 import shlex
 import subprocess
 from subprocess import TimeoutExpired, PIPE
-import time
 import threading
 
 _my_ip1 = ''
@@ -401,10 +400,10 @@ def _print_info():
 
 def _time_start():
 	global _start_time
-	_start_time = time()
+	_start_time = time.time()
 
 def _time_end():
-	elapsed_time = time() - _start_time
+	elapsed_time = time.time() - _start_time
 	print('time: {0:.2f}[sec]'.format(elapsed_time))
 
 def _update_data():
