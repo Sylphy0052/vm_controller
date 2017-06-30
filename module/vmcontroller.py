@@ -5,7 +5,7 @@ import sqlite3
 import shlex
 import subprocess
 from subprocess import TimeoutExpired, PIPE
-from time import time
+import time
 import threading
 
 _my_ip1 = ''
@@ -719,6 +719,8 @@ def migrate(vm_id, to_id):
 		p.wait(timeout = 100)
 	except TimeoutExpired:
 		pass
+
+	time.sleep(20)
 
 	sql = '''
 	update vmdata set ipadd = ?, vmip = ?
